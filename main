@@ -1,0 +1,77 @@
+from random import randint, choice, shuffle
+import tkinter as tk
+from tkinter import messagebox
+import pyperclip
+
+
+# ---------------------------- PASSWORD GENERATOR ------------------------------- #
+def gen_click():
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+               'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
+
+    password_letters = [choice(letters) for _ in range(randint(8, 10))]
+    password_symbols = [choice(symbols) for _ in range(randint(2, 4))]
+    password_numbers = [choice(numbers) for _ in range(randint(2, 4))]
+    password_list = password_numbers + password_symbols + password_letters
+    shuffle(password_list)
+    password = "".join(password_list)
+    password_entry.insert(0, password)
+    pyperclip.copy(password)
+
+
+# ---------------------------- SAVE PASSWORD ------------------------------- #
+def add_click():
+    website = website_entry.get()
+    username = username_entry.get()
+    password = password_entry.get()
+    if len(website) == 0 or len(username) == 0 or len(password) == 0:
+        messagebox.showinfo(message="A field is empty.")
+    else:
+        is_ok = messagebox.askokcancel(
+            message=f"Is this info correct?:\nwebsite:\n{website}\nusername:\n{username}\npassword:\n{password}")
+        if is_ok:
+            f = open("data.txt", "a")
+            f.write(f"{website}:{username}:{password}\n")
+            f.close()
+            website_entry.delete(0, "end")
+            password_entry.delete(0, "end")
+
+
+# ---------------------------- UI SETUP ------------------------------- #
+window = tk.Tk()
+window.config(padx=20, pady=20)
+canvas = tk.Canvas(width=200, height=200, highlightthickness=0)
+logo_img = tk.PhotoImage(file="logo.png")
+canvas.create_image(100, 100, image=logo_img)
+canvas.grid(column=1, row=0)
+
+# labels
+website_l = tk.Label(text="Website:")
+website_l.grid(column=0, row=1)
+username_l = tk.Label(text="username:")
+username_l.grid(column=0, row=2)
+password_l = tk.Label(text="password:")
+password_l.grid(column=0, row=3)
+
+# entry
+website_entry = tk.Entry(width=40)
+website_entry.insert("end", string="")
+website_entry.focus()
+website_entry.grid(column=1, row=1, columnspan=2)
+username_entry = tk.Entry(width=40)
+username_entry.insert("end", string="")
+username_entry.grid(column=1, row=2, columnspan=2)
+username_entry.insert(0, "steve@blindcamel.com")
+password_entry = tk.Entry(width=21)
+password_entry.grid(column=1, row=3)
+
+# buttons
+generate_b = tk.Button(text="generate password", command=gen_click)
+generate_b.grid(column=2, row=3)
+add_b = tk.Button(text="Add", command=add_click, width=37)
+add_b.grid(column=1, row=4, columnspan=2)
+
+window.mainloop()
